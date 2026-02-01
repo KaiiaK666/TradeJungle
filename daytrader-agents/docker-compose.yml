@@ -1,0 +1,253 @@
+x-agent-env: &agent_env
+  MODE: agent
+  HUB_URL: http://hub:8000
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+  MODEL_NAME: ${MODEL_NAME:-claude-3-5-sonnet-latest}
+  AGENT_TICK_SECONDS: ${AGENT_TICK_SECONDS:-4}
+  AGENT_POST_CHANCE: ${AGENT_POST_CHANCE:-0.85}
+  REPLY_CHANCE: ${REPLY_CHANCE:-0.35}
+  AGENT_JITTER_SECONDS: ${AGENT_JITTER_SECONDS:-0.6}
+
+x-agent-base: &agent_base
+  build: ./backend
+  depends_on:
+    - hub
+  restart: unless-stopped
+
+services:
+  hub:
+    build: ./backend
+    environment:
+      MODE: hub
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      MODEL_NAME: ${MODEL_NAME:-claude-3-5-sonnet-latest}
+      AGENT_COUNT: ${AGENT_COUNT:-33}
+      TICK_SECONDS: ${TICK_SECONDS:-3}
+      PRICE_TICK_SECONDS: ${PRICE_TICK_SECONDS:-3}
+      START_PRICE: ${START_PRICE:-100}
+      START_CASH: ${START_CASH:-100000}
+      RESEARCH_ENABLED: ${RESEARCH_ENABLED:-1}
+      RESEARCH_TICK_SECONDS: ${RESEARCH_TICK_SECONDS:-120}
+      RESEARCH_MAX_ITEMS: ${RESEARCH_MAX_ITEMS:-80}
+      RESEARCH_SNAPSHOT_LIMIT: ${RESEARCH_SNAPSHOT_LIMIT:-12}
+      RESEARCH_ALLOW_NSFW: ${RESEARCH_ALLOW_NSFW:-0}
+      RESEARCH_USER_AGENT: ${RESEARCH_USER_AGENT:-daytrader-agents/0.1}
+      REDDIT_MODE: ${REDDIT_MODE:-hot}
+      REDDIT_LIMIT: ${REDDIT_LIMIT:-6}
+      REDDIT_SUBREDDITS: ${REDDIT_SUBREDDITS:-stocks,investing,wallstreetbets,options,futures,commodities,gold,silverbugs,oil,energy,news}
+      MARKET_FEED_ENABLED: ${MARKET_FEED_ENABLED:-1}
+      MARKET_REFRESH_SECONDS: ${MARKET_REFRESH_SECONDS:-120}
+      COMMODITY_SYMBOLS: ${COMMODITY_SYMBOLS:-GC=F,SI=F,CL=F,HG=F}
+      CRYPTO_LIMIT: ${CRYPTO_LIMIT:-0}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    environment:
+      - VITE_API_BASE=http://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - hub
+    restart: unless-stopped
+  agent-01:
+    <<: *agent_base
+    container_name: agent-01
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Alex Agent_01
+  agent-02:
+    <<: *agent_base
+    container_name: agent-02
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Jordan Agent_02
+  agent-03:
+    <<: *agent_base
+    container_name: agent-03
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Taylor Agent_03
+  agent-04:
+    <<: *agent_base
+    container_name: agent-04
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Morgan Agent_04
+  agent-05:
+    <<: *agent_base
+    container_name: agent-05
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Riley Agent_05
+  agent-06:
+    <<: *agent_base
+    container_name: agent-06
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Casey Agent_06
+  agent-07:
+    <<: *agent_base
+    container_name: agent-07
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Avery Agent_07
+  agent-08:
+    <<: *agent_base
+    container_name: agent-08
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Quinn Agent_08
+  agent-09:
+    <<: *agent_base
+    container_name: agent-09
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Parker Agent_09
+  agent-10:
+    <<: *agent_base
+    container_name: agent-10
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Drew Agent_10
+  agent-11:
+    <<: *agent_base
+    container_name: agent-11
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Logan Agent_11
+  agent-12:
+    <<: *agent_base
+    container_name: agent-12
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Hayden Agent_12
+  agent-13:
+    <<: *agent_base
+    container_name: agent-13
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Rowan Agent_13
+  agent-14:
+    <<: *agent_base
+    container_name: agent-14
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Skyler Agent_14
+  agent-15:
+    <<: *agent_base
+    container_name: agent-15
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Blake Agent_15
+  agent-16:
+    <<: *agent_base
+    container_name: agent-16
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Cameron Agent_16
+  agent-17:
+    <<: *agent_base
+    container_name: agent-17
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Reese Agent_17
+  agent-18:
+    <<: *agent_base
+    container_name: agent-18
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Emerson Agent_18
+  agent-19:
+    <<: *agent_base
+    container_name: agent-19
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Elliot Agent_19
+  agent-20:
+    <<: *agent_base
+    container_name: agent-20
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Finley Agent_20
+  agent-21:
+    <<: *agent_base
+    container_name: agent-21
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Harper Agent_21
+  agent-22:
+    <<: *agent_base
+    container_name: agent-22
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Sawyer Agent_22
+  agent-23:
+    <<: *agent_base
+    container_name: agent-23
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Dakota Agent_23
+  agent-24:
+    <<: *agent_base
+    container_name: agent-24
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Phoenix Agent_24
+  agent-25:
+    <<: *agent_base
+    container_name: agent-25
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Sage Agent_25
+  agent-26:
+    <<: *agent_base
+    container_name: agent-26
+    environment:
+      <<: *agent_env
+      AGENT_NAME: River Agent_26
+  agent-27:
+    <<: *agent_base
+    container_name: agent-27
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Spencer Agent_27
+  agent-28:
+    <<: *agent_base
+    container_name: agent-28
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Payton Agent_28
+  agent-29:
+    <<: *agent_base
+    container_name: agent-29
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Jules Agent_29
+  agent-30:
+    <<: *agent_base
+    container_name: agent-30
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Kai Agent_30
+  agent-31:
+    <<: *agent_base
+    container_name: agent-31
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Micah Agent_31
+  agent-32:
+    <<: *agent_base
+    container_name: agent-32
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Noah Agent_32
+  agent-33:
+    <<: *agent_base
+    container_name: agent-33
+    environment:
+      <<: *agent_env
+      AGENT_NAME: Zion Agent_33
+

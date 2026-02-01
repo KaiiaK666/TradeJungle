@@ -1,0 +1,126 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { getConfig, getState, getPnL } from "./api.js";
+
+export default function App() {
+  const [config, setConfig] = useState(null);
+  const [state, setState] = useState(null);
+  const [pnl, setPnl] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      setConfig(await getConfig());
+    })();
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(async () => {
+      setState(await getState());
+      setPnl(await getPnL());
+    }, 1500);
+    return () => clearInterval(t);
+  }, []);
+
+  const price = state?.price ?? 0;
+
+  const posts = useMemo(() => (state?.posts ?? []).slice().reverse(), [state]);
+  const trades = useMemo(() => (state?.trades ?? []).slice().reverse(), [state]);
+
+  return (
+    <div style={{ fontFamily: "system-ui", padding: 16, maxWidth: 1200, margin: "0 auto" }}>
+      <h2>Agent Forum + Paper Trading Sandbox</h2>
+
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <Card title="Config">
+          {!config ? (
+            <div>Loading…</div>
+          ) : (
+            <ul style={{ margin: 0, paddingLeft: 16 }}>
+              <li>Agents: {config.agent_count}</li>
+              <li>Tick seconds: {config.tick_seconds}</li>
+              <li>Posts per tick: {config.max_posts_per_tick}</li>
+              <li>Model: {config.model_name}</li>
+              <li>Claude API enabled: {String(config.using_claude_api)}</li>
+            </ul>
+          )}
+        </Card>
+
+        <Card title="Simulated Price">
+          <div style={{ fontSize: 28, fontWeight: 700 }}>{price.toFixed(2)}</div>
+          <div style={{ opacity: 0.7 }}>Random-walk feed (replace with real market data later)</div>
+        </Card>
+
+        <Card title="Top Equity (Paper)">
+          <div style={{ maxHeight: 220, overflow: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ textAlign: "left" }}>
+                  <th>Agent</th>
+                  <th>Equity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pnl.map((row) => (
+                  <tr key={row.agent}>
+                    <td>{row.agent}</td>
+                    <td>{row.equity.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+
+      <div style={{ display: "flex", gap: 16, marginTop: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <Card title="Forum Feed" style={{ flex: "1 1 620px" }}>
+          <div style={{ maxHeight: 520, overflow: "auto" }}>
+            {posts.map((p) => (
+              <div key={p.id} style={{ padding: "10px 0", borderBottom: "1px solid #eee" }}>
+                <div style={{ fontWeight: 700 }}>{p.agent}</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{p.text}</div>
+                <div style={{ opacity: 0.55, fontSize: 12 }}>
+                  {new Date(p.ts * 1000).toLocaleTimeString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card title="Recent Paper Trades" style={{ flex: "1 1 420px" }}>
+          <div style={{ maxHeight: 520, overflow: "auto" }}>
+            {trades.map((t) => (
+              <div key={t.id} style={{ padding: "10px 0", borderBottom: "1px solid #eee" }}>
+                <div style={{ fontWeight: 700 }}>{t.agent}</div>
+                <div>
+                  {t.side} {t.qty} @ {t.price.toFixed(2)}
+                </div>
+                <div style={{ opacity: 0.55, fontSize: 12 }}>
+                  {new Date(t.ts * 1000).toLocaleTimeString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <p style={{ marginTop: 18, opacity: 0.7 }}>
+        Safety note: this is a simulation/paper sandbox. It is not financial advice and does not execute real trades.
+      </p>
+    </div>
+  );
+}
+
+function Card({ title, children, style }) {
+  return (
+    <div style={{
+      border: "1px solid #e6e6e6",
+      borderRadius: 12,
+      padding: 12,
+      minWidth: 280,
+      ...style
+    }}>
+      <div style={{ fontWeight: 800, marginBottom: 8 }}>{title}</div>
+      {children}
+    </div>
+  );
+}
